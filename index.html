@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>工具台</title>
+<meta name="description" content="OO 的常用应用入口——把这几年做的小应用收在一处。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%BF%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root{
+    --bg:#F1EDE6; --panel:#EAE4D9; --hover:#E7E0D2;
+    --ink:#17140E; --soft:#787063; --faint:#A79E8E; --hairline:#DBD4C5; --hair2:#CCC2AF;
+    --accent:#5B6A38;               /* 橄榄绿：主强调 */
+    --accent-2:#D9772E;             /* 橙：live 微跳色 */
+    --accent-soft:rgba(91,106,56,.12);
+  }
+
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Geist","Noto Sans SC",system-ui,sans-serif; font-weight:400; line-height:1.65;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; min-height:100vh;
+  }
+
+  .glow{ position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:radial-gradient(70% 50% at 12% -8%, rgba(255,252,244,.6), transparent 55%); }
+
+  .sheet{ position:relative; z-index:1; max-width:1000px; margin:0 auto; padding:0 clamp(24px,6vw,80px); }
+
+  .topbar{ display:flex; justify-content:space-between; align-items:center; padding:24px 0;
+    font-family:"Geist Mono",monospace; font-size:11.5px; font-weight:500; letter-spacing:.16em; text-transform:uppercase; color:var(--soft); }
+  .topbar .right{ color:var(--faint); }
+
+  .masthead{ padding:clamp(52px,10vw,110px) 0 clamp(46px,7vw,80px); }
+  .eyebrow{ margin:0 0 clamp(22px,4vw,32px); font-family:"Geist Mono",monospace;
+    font-size:12px; font-weight:500; letter-spacing:.2em; text-transform:uppercase; color:var(--accent); }
+  .title-row{ display:flex; align-items:flex-end; gap:clamp(20px,4vw,40px); }
+  .title{ margin:0; font-family:"Noto Sans SC","Geist",sans-serif; font-weight:500;
+    font-size:clamp(62px,13vw,150px); line-height:.92; letter-spacing:.01em; color:var(--ink); white-space:nowrap; }
+  .title-rule{ flex:1; height:1px; background:var(--hair2); margin-bottom:clamp(18px,4vw,42px); }
+  .sub-lat{ font-family:"Geist Mono",monospace; font-weight:400; font-size:clamp(13px,1.8vw,15px);
+    letter-spacing:.08em; text-transform:uppercase; color:var(--faint); margin-bottom:clamp(20px,4vw,44px); white-space:nowrap; }
+  .lede{ margin:clamp(30px,5vw,48px) 0 0; max-width:36ch; font-family:"Noto Sans SC",sans-serif;
+    font-weight:300; font-size:clamp(16px,2.2vw,19px); line-height:1.85; color:var(--soft); }
+  .meta{ margin-top:26px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    font-family:"Geist Mono",monospace; font-size:12.5px; letter-spacing:.04em; color:var(--faint); }
+  .meta .sep{ width:16px; height:1px; background:var(--hair2); }
+
+  .index-head{ display:flex; align-items:center; gap:14px; }
+  .index-head .lbl{ font-family:"Geist Mono",monospace; font-size:11.5px; font-weight:500;
+    letter-spacing:.2em; text-transform:uppercase; color:var(--soft); }
+  .index-head .rule{ flex:1; height:1px; background:var(--hair2); }
+
+  .entries{ margin:0 0 clamp(36px,7vw,72px); }
+  .entry{ position:relative; display:grid;
+    grid-template-columns:64px minmax(150px,1fr) minmax(0,1.55fr) 130px;
+    align-items:baseline; gap:clamp(18px,3vw,36px);
+    padding:clamp(22px,3.2vw,32px) 16px; margin:0 -16px;
+    border-top:1px solid var(--hairline); text-decoration:none; color:inherit; border-radius:14px;
+    transition:background .38s ease, transform .38s cubic-bezier(.2,.7,.3,1); }
+  .entry:last-child{ border-bottom:1px solid var(--hairline); }
+  .entry .no{ font-family:"Geist Mono",monospace; font-weight:400; font-size:clamp(15px,1.6vw,17px);
+    line-height:1; color:var(--faint); letter-spacing:.02em; transition:color .38s ease; padding-top:.4em; }
+  .entry .name{ margin:0; font-family:"Noto Sans SC",sans-serif; font-weight:500;
+    font-size:clamp(21px,2.7vw,27px); letter-spacing:.01em; line-height:1.25; color:var(--ink); }
+  .entry .en{ display:block; margin-top:7px; font-family:"Geist Mono",monospace; font-weight:400;
+    font-size:12.5px; letter-spacing:.03em; text-transform:uppercase; color:var(--faint); }
+  .entry .desc{ margin:0; font-family:"Noto Sans SC",sans-serif; font-weight:300; font-size:15px;
+    line-height:1.8; color:var(--soft); max-width:44ch; }
+  .entry .foot{ justify-self:end; display:flex; flex-direction:column; align-items:flex-end; gap:11px; transition:opacity .32s ease; }
+  .status{ display:inline-flex; align-items:center; gap:8px; font-family:"Geist Mono",monospace;
+    font-size:11px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--soft); white-space:nowrap; }
+  .status::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--accent-2); }
+  .status.soon::before{ background:var(--faint); }
+  .status.off::before{ background:var(--faint); opacity:.55; }
+  .entry .url{ font-family:"Geist Mono",monospace; font-size:12.5px; color:var(--faint); white-space:nowrap; }
+  .arrow{ position:absolute; right:18px; top:50%; transform:translateY(-50%) translateX(-8px); opacity:0;
+    font-family:"Geist Mono",monospace; font-size:20px; color:var(--accent); transition:opacity .38s ease, transform .38s cubic-bezier(.2,.7,.3,1); }
+  .entry[href]:hover{ background:var(--hover); transform:translateX(3px); }
+  .entry[href]:hover .no{ color:var(--accent); }
+  .entry[href]:hover .foot{ opacity:0; }
+  .entry[href]:hover .arrow{ opacity:1; transform:translateY(-50%) translateX(0); }
+  .entry[href]:focus-visible{ outline:none; background:var(--hover); box-shadow:inset 0 0 0 1.5px var(--accent); }
+  .entry.off .name,.entry.off .no{ color:var(--faint); }
+
+  .colophon{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+    padding:30px 0; border-top:1px solid var(--hairline); margin-top:8px;
+    font-family:"Geist Mono",monospace; font-size:11.5px; letter-spacing:.06em; color:var(--faint); }
+
+  @keyframes rise{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:none;} }
+  .anim{ opacity:0; animation:rise .8s cubic-bezier(.2,.7,.3,1) forwards; }
+  @media (prefers-reduced-motion:reduce){ .anim{ animation:none; opacity:1; } *{ transition:none !important; } }
+
+  @media (max-width:720px){ .title-row{ flex-direction:column; align-items:flex-start; gap:6px; } .title-rule,.sub-lat{ display:none; } }
+  @media (max-width:680px){
+    .entry{ grid-template-columns:38px 1fr; grid-template-areas:"no name" "no desc" "no foot"; row-gap:12px; align-items:start; }
+    .entry .no{ grid-area:no; padding-top:.5em; } .entry .name{ grid-area:name; } .entry .desc{ grid-area:desc; }
+    .entry .foot{ grid-area:foot; flex-direction:row; align-items:center; gap:16px; justify-self:start; }
+    .entry[href]:hover .foot{ opacity:1; } .arrow{ display:none; }
+  }
+</style>
+</head>
+<body>
+  <div class="glow"></div>
+  <div class="sheet">
+    <div class="topbar"><span>工具台 / TOOLS</span><span class="right">OO</span></div>
+
+    <header class="masthead">
+      <p class="eyebrow anim" style="animation-delay:.05s">A personal collection · 常用应用</p>
+      <div class="title-row anim" style="animation-delay:.12s">
+        <h1 class="title">工具台</h1>
+        <span class="sub-lat">the studio</span>
+        <span class="title-rule"></span>
+      </div>
+      <p class="lede anim" style="animation-delay:.22s">把这几年做的小应用收在一处。记账、记食、记事，日子里要用的，都从这一页进出。</p>
+      <div class="meta anim" style="animation-delay:.3s"><span>6 TOOLS</span><span class="sep"></span><span>4 LIVE</span><span class="sep"></span><span>MADE BY OO</span></div>
+    </header>
+
+    <div class="index-head anim" style="animation-delay:.36s"><span class="lbl">目录 / index</span><span class="rule"></span></div>
+
+    <section class="entries" id="entries"></section>
+
+    <footer class="colophon"><span>KEPT ON THE DESK · USED EVERY DAY</span><span>OO — 2026</span></footer>
+  </div>
+
+  <script>
+    const TOOLS = [
+      { no:"01", name:"健身饮食", en:"food & fitness", desc:"记录三餐的蛋白、碳水与脂肪，连同运动和睡眠，看今天离目标还差多少。", url:"github.io/fitness-tracker", href:"https://syanaooooooo.github.io/fitness-tracker/", st:"", label:"Live" },
+      { no:"02", name:"日迹", en:"calendairy", desc:"像素风的每日生活记录，用一组小标签把一天里读了什么、去了哪儿留下来。", url:"github.io/calendairy", href:"https://syanaooooooo.github.io/calendairy/", st:"", label:"Live" },
+      { no:"03", name:"博饼分账", en:"bobing", desc:"每年中秋博饼的记账本，自动算出谁转给谁的最少一笔结算。", url:"bobing-app.pages.dev", href:"https://bobing-app.pages.dev", st:"", label:"Live" },
+      { no:"04", name:"宝宝健康", en:"baby health", desc:"记录生长曲线、睡眠与生病的病程，发烧时自动提醒复测。", url:"babyhealthlog.vercel.app", href:"https://babyhealthlog.vercel.app", st:"", label:"Live" },
+      { no:"05", name:"转型追踪", en:"career · DE/AE", desc:"数据工程转型的学习路径与求职看板，一处追踪进度与投递。", url:"待部署 · Vercel", href:"", st:"soon", label:"Soon" },
+      { no:"06", name:"生活助理", en:"life assistant", desc:"把长期的人生事项做成定时提醒，经 Telegram 推送，没有网页。", url:"Telegram", href:"", st:"off", label:"Offline" },
+    ];
+    document.getElementById('entries').innerHTML = TOOLS.map((t,i)=>{
+      const link=!!t.href; const tag=link?`a href="${t.href}" target="_blank" rel="noopener"`:'div';
+      const delay=(0.42+i*0.06).toFixed(2);
+      return `<${tag} class="entry anim ${link?'':'off'}" style="animation-delay:${delay}s">
+        <span class="no">${t.no}</span>
+        <div><h2 class="name">${t.name}<span class="en">${t.en}</span></h2></div>
+        <p class="desc">${t.desc}</p>
+        <div class="foot"><span class="url">${t.url}</span><span class="status ${t.st}">${t.label}</span></div>
+        ${link?'<span class="arrow" aria-hidden="true">&rarr;</span>':''}
+      </${link?'a':'div'}>`;
+    }).join('');
+  </script>
+</body>
+</html>
