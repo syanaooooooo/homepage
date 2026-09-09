@@ -248,17 +248,24 @@
   });
   const chips=[...bar.querySelectorAll('.chip')];
   function moveInd(chip){ ind.style.width=chip.offsetWidth+'px'; ind.style.transform=`translateX(${chip.offsetLeft-6}px)`; }
+  let curCat = 'all';
   function filter(cat){
+    if(cat===curCat) { const a=chips.find(c=>c.dataset.cat===cat); if(a) moveInd(a); return; }
+    curCat = cat;
     chips.forEach(c=>c.setAttribute('aria-selected', c.dataset.cat===cat));
     document.querySelectorAll('.zone').forEach(z=>{
       const show = cat==='all' || z.dataset.cat===cat;
       z.classList.toggle('hide', !show);
+      if(show) z.querySelectorAll('.reveal').forEach(el=>el.classList.add('in')); // 确保直接可见，不闪
     });
-    // 重新触发进场
-    requestAnimationFrame(()=>{ document.querySelectorAll('.zone:not(.hide) .reveal').forEach((el,i)=>{ el.classList.remove('in'); void el.offsetWidth; setTimeout(()=>el.classList.add('in'), Math.min(i*28,260)); }); });
     const active=chips.find(c=>c.dataset.cat===cat); if(active) moveInd(active);
   }
-  chips.forEach(c=>c.addEventListener('click',()=>filter(c.dataset.cat)));
+  // 悬停即筛选（保留点击/键盘，方便手机与无障碍）
+  chips.forEach(c=>{
+    c.addEventListener('mouseenter',()=>filter(c.dataset.cat));
+    c.addEventListener('click',()=>filter(c.dataset.cat));
+    c.addEventListener('focus',()=>filter(c.dataset.cat));
+  });
   window.addEventListener('load',()=>{ const first=chips[0]; first.setAttribute('aria-selected','true'); moveInd(first); });
   window.addEventListener('resize',()=>{ const a=chips.find(c=>c.getAttribute('aria-selected')==='true')||chips[0]; moveInd(a); });
 
